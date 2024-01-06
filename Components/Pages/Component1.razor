@@ -1,0 +1,93 @@
+﻿@page "/todocomponent"
+
+
+<h3>Component1</h3>
+<EditForm Model="todoModel">
+    <div>
+        <label for="task" class="form-label">Task</label>
+        <input type="text" class="form-control" @bind-value="todoModel.Task" id="task" />
+        <button class="btn btn-primary mt-3" @onclick="AddTask">Save</button>
+    </div>
+</EditForm>
+
+<div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Task</th>
+                <th>Is Completed</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach(var task in todoModels)
+            {
+                <tr>
+                    <td>@task.ID</td>
+                    <td>@task.Task</td>
+                    <td>@task.IsCompleted</td>
+                    <td>
+                        @if (!task.IsCompleted)
+                        {
+                            <button class="btn btn-sm btn-success" @onclick="() => CompleteTask(task.ID)">Complete</button>
+                        }
+                        @if (!task.IsCompleted)
+                        {
+                            <button class="btn btn-sm btn-danger mx-2" @onclick="() => DeleteItems(task.ID)">Delete</button>
+                        }
+                        @if (!task.IsCompleted)
+                        {
+                            <button class="btn btn-sm btn-warning mx-2" @onclick="() => EditTask(task.ID)">Update</button>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@code {
+    private List<TodoModel> todoModels = new();
+
+    // form create garna
+    private TodoModel todoModel = new();
+
+    private void AddTask()
+    {
+        if (todoModel != null && todoModel.ID > 0)
+        {
+            var toUpdate = todoModels.Find(x => x.ID == todoModel.ID);
+            if (toUpdate != null)
+                toUpdate.Task = todoModel.Task;
+        }
+        else
+        {
+            todoModel.ID = todoModels.Count + 1;
+            todoModels.Add(todoModel);
+        }
+
+        todoModel = new();
+    }
+
+
+    private void EditTask(int taskID)
+    {
+        var toEdit = todoModels.Where(x => x.ID == taskID).FirstOrDefault();
+        if (toEdit != null) todoModel = toEdit;
+    }
+
+    private void CompleteTask(int taskID)
+    {
+        var toComplete = todoModels.Find(x => x.ID == taskID);
+        if (toComplete != null)
+            toComplete.IsCompleted = true;
+    }
+
+    private void DeleteItems(int taskID)
+    {
+        var toDeleteItem = todoModels.Find(x => x.ID == taskID);
+        if (toDeleteItem != null)
+            todoModels.Remove(toDeleteItem);
+    }
+}
